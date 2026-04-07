@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
+from sklearn.neighbors import NearestNeighbors
 
 # ==============================
 # 🚀 INIT
@@ -14,37 +15,30 @@ model = joblib.load("../models/reg_model.pkl")
 products_df = pd.read_csv("../data/realistic_ecommerce_data.csv")
 
 # ==============================
-# 🛍️ RECOMMENDATION FUNCTION (FINAL)
+# 🤖 BUILD KNN MODEL (AI CORE)
 # ==============================
-def recommend_products(data, prob):
+features = products_df[["Recency", "Frequency", "Monetary"]]
 
-    # High value customers
-    if prob > 0.7:
-        filtered = products_df[
-            products_df["Monetary"] > products_df["Monetary"].median()
-        ]
+knn = NearestNeighbors(n_neighbors=5, metric="euclidean")
+knn.fit(features)
 
-    # Medium customers
-    elif prob > 0.4:
-        filtered = products_df
+# ==============================
+# 🤖 AI RECOMMENDATION FUNCTION
+# ==============================
+def recommend_products_ai(data):
 
-    # Low customers
-    else:
-        filtered = products_df[
-            products_df["Monetary"] < products_df["Monetary"].median()
-        ]
+    user_vector = [[
+        data["Days_Since_Last_Purchase"],
+        data["Num_Transactions"],
+        data["Total_Spend"]
+    ]]
 
-    # Similarity filter
-    filtered = filtered[
-        (filtered["Monetary"] >= data["Total_Spend"] * 0.5) &
-        (filtered["Monetary"] <= data["Total_Spend"] * 1.5)
-    ]
+    distances, indices = knn.kneighbors(user_vector)
 
-    if filtered.empty:
-        filtered = products_df
+    similar_users = products_df.iloc[indices[0]]
 
     recommendations = (
-        filtered["Product_Category"]
+        similar_users["Product_Category"]
         .value_counts()
         .head(3)
         .index
@@ -58,7 +52,7 @@ def recommend_products(data, prob):
 # ==============================
 @app.route("/")
 def home():
-    return "✅ FINAL ML API RUNNING"
+    return "✅ AI Recommendation API Running"
 
 # ==============================
 # 🔥 FINAL API
@@ -80,7 +74,7 @@ def predict_all():
         }])
 
         # ==============================
-        # PREDICTION
+        # ML PREDICTION
         # ==============================
         prob = model.predict_proba(df)[0][1]
 
@@ -95,13 +89,13 @@ def predict_all():
             score = "🧊 Low Value Customer"
 
         # ==============================
-        # RECOMMENDATION
+        # 🤖 AI RECOMMENDATION
         # ==============================
-        recommended_products = recommend_products(data, prob)
+        recommended_products = recommend_products_ai(data)
 
         print("PROB:", prob)
         print("SCORE:", score)
-        print("RECOMMEND:", recommended_products)
+        print("AI RECOMMEND:", recommended_products)
 
         return jsonify({
             "status": "success",
