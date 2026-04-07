@@ -37,11 +37,14 @@ df["Monetary"].fillna(df["Monetary"].median(), inplace=True)
 # ==============================
 # 🎯 TARGET (SMART SEGMENTATION)
 # ==============================
-df["Target"] = (
-    (df["Monetary"] > df["Monetary"].median()) &
-    (df["Frequency"] > df["Frequency"].median()) &
-    (df["Recency"] < df["Recency"].median())
-).astype(int)
+df["Target"] = 0
+
+df.loc[
+    (df["Monetary"] > df["Monetary"].quantile(0.7)) &
+    (df["Frequency"] > df["Frequency"].quantile(0.7)) &
+    (df["Recency"] < df["Recency"].quantile(0.3)),
+    "Target"
+] = 1
 
 # ==============================
 # FEATURES
