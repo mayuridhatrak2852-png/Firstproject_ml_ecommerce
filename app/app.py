@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
+import random
 
 # ==============================
 # 🚀 INIT
@@ -11,11 +12,11 @@ app = Flask(__name__)
 # ==============================
 # 📦 LOAD MODEL + DATA
 # ==============================
-model = joblib.load("../models/reg_model.pkl")
+model = joblib.load("../models/model.pkl")
 products_df = pd.read_csv("../data/realistic_ecommerce_data.csv")
 
 # ==============================
-# 🤖 BUILD KNN MODEL (AI CORE)
+# 🤖 BUILD KNN MODEL
 # ==============================
 features = products_df[["Recency", "Frequency", "Monetary"]]
 
@@ -23,7 +24,7 @@ knn = NearestNeighbors(n_neighbors=5, metric="euclidean")
 knn.fit(features)
 
 # ==============================
-# 🤖 AI RECOMMENDATION FUNCTION
+# 🤖 AI RECOMMENDATION
 # ==============================
 def recommend_products_ai(data):
 
@@ -37,13 +38,20 @@ def recommend_products_ai(data):
 
     similar_users = products_df.iloc[indices[0]]
 
-    recommendations = (
-        similar_users["Product_Category"]
-        .value_counts()
-        .head(3)
-        .index
-        .tolist()
-    )
+    categories = similar_users["Product_Category"].dropna()
+
+    if len(categories) > 0:
+        # Get ranked categories
+        recommendations = categories.value_counts().index.tolist()
+
+        # Remove duplicates safely
+        recommendations = list(dict.fromkeys(recommendations))
+
+        # Add randomness (AI-like behavior)
+        if len(recommendations) >= 3:
+            recommendations = random.sample(recommendations, 3)
+    else:
+        recommendations = ["Electronics", "Fashion", "Home"]
 
     return recommendations
 
@@ -60,12 +68,10 @@ def home():
 @app.route("/predict_all", methods=["POST"])
 def predict_all():
     try:
-        print("🔥 HIT API")
-
         data = request.json
 
         # ==============================
-        # RFM INPUT
+        # INPUT → RFM
         # ==============================
         df = pd.DataFrame([{
             "Recency": data["Days_Since_Last_Purchase"],
@@ -74,12 +80,12 @@ def predict_all():
         }])
 
         # ==============================
-        # ML PREDICTION
+        # ✅ CLASSIFIER PROBABILITY
         # ==============================
         prob = model.predict_proba(df)[0][1]
 
         # ==============================
-        # CUSTOMER SCORE
+        # CUSTOMER SEGMENT
         # ==============================
         if prob > 0.7:
             score = "🔥 High Value Customer"
@@ -93,13 +99,9 @@ def predict_all():
         # ==============================
         recommended_products = recommend_products_ai(data)
 
-        print("PROB:", prob)
-        print("SCORE:", score)
-        print("AI RECOMMEND:", recommended_products)
-
         return jsonify({
             "status": "success",
-            "purchase_probability": float(prob),
+            "purchase_probability": float(round(prob, 3)),
             "customer_score": score,
             "recommended_products": recommended_products
         })

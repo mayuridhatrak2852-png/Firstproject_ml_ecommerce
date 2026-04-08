@@ -70,6 +70,6 @@ model.fit(X_train, y_train)
 # ==============================
 # SAVE MODEL
 # ==============================
-joblib.dump(model, "models/reg_model.pkl")
+joblib.dump(model, "models/model.pkl")
 
 print("✅ MODEL TRAINED SUCCESSFULLY")
