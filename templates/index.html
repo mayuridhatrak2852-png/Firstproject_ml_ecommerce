@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Intelligence Platform — Customer Analytics & Product Recommendations</title>
+  <meta name="description"
+    content="Unified AI platform combining Kaushalesh Customer Intelligence and DMart Product Recommendation Engine powered by ML." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       DESIGN TOKENS
+    ══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg:        #080d1a;
+      --bg2:       #0c1424;
+      --surface:   #111827;
+      --surface2:  #1a2539;
+      --surface3:  #1f2d44;
+
+      /* Kaushalesh palette — purple / violet */
+      --k-primary:  #a78bfa;
+      --k-accent:   #7c3aed;
+      --k-glow:     rgba(167, 139, 250, 0.18);
+      --k-border:   rgba(167, 139, 250, 0.22);
+
+      /* DMart palette — cyan / blue */
+      --d-primary:  #38bdf8;
+      --d-accent:   #0284c7;
+      --d-glow:     rgba(56, 189, 248, 0.14);
+      --d-border:   rgba(56, 189, 248, 0.22);
+
+      --green:      #34d399;
+      --amber:      #fbbf24;
+      --red:        #f87171;
+
+      --text:       #e2e8f0;
+      --text-muted: #94a3b8;
+      --border:     rgba(255, 255, 255, 0.07);
+
+      --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      --radius:      18px;
+      --radius-sm:   10px;
+      --radius-xs:   6px;
+      --tr:          0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       RESET & BASE
+    ══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated mesh background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 0% 0%,   rgba(124, 58, 237, 0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 100% 0%,  rgba(2, 132, 199, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 50% 100%, rgba(167, 139, 250, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       GLOBAL HEADER
+    ══════════════════════════════════════════════════════════════ */
+    .global-header {
+      position: relative;
+      z-index: 10;
+      padding: 2.5rem 2rem 0;
+      text-align: center;
+    }
+
+    .platform-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(56,189,248,0.10));
+      border: 1px solid rgba(167,139,250,0.25);
+      border-radius: 999px;
+      padding: 8px 22px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--k-primary);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .platform-badge .pulse-dot {
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.5); opacity: 0.6; }
+    }
+
+    .global-title {
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #e2e8f0 20%, var(--k-primary) 55%, var(--d-primary) 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.8rem;
+    }
+
+    .global-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 640px;
+      margin: 0 auto 1rem;
+      line-height: 1.7;
+    }
+
+    /* Nav pills */
+    .nav-pills {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 1.5rem 0 0;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 0.82rem; font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--tr);
+      border: 1px solid transparent;
+    }
+
+    .nav-pill.k-pill {
+      background: rgba(167,139,250,0.10);
+      border-color: var(--k-border);
+      color: var(--k-primary);
+    }
+    .nav-pill.k-pill:hover {
+      background: rgba(167,139,250,0.20);
+      box-shadow: 0 0 16px rgba(167,139,250,0.2);
+    }
+
+    .nav-pill.d-pill {
+      background: rgba(56,189,248,0.08);
+      border-color: var(--d-border);
+      color: var(--d-primary);
+    }
+    .nav-pill.d-pill:hover {
+      background: rgba(56,189,248,0.16);
+      box-shadow: 0 0 16px rgba(56,189,248,0.18);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SECTION DIVIDER
+    ══════════════════════════════════════════════════════════════ */
+    .section-sep {
+      position: relative;
+      z-index: 5;
+      max-width: 1100px;
+      margin: 3rem auto 0;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-sep-line {
+      flex: 1;
+      height: 1px;
+    }
+    .section-sep-line.k-line { background: linear-gradient(90deg, transparent, var(--k-border), transparent); }
+    .section-sep-line.d-line { background: linear-gradient(90deg, transparent, var(--d-border), transparent); }
+
+    .section-sep-label {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .section-sep-label.k-label {
+      background: rgba(167,139,250,0.10);
+      border: 1px solid var(--k-border);
+      color: var(--k-primary);
+    }
+
+    .section-sep-label.d-label {
+      background: rgba(56,189,248,0.08);
+      border: 1px solid var(--d-border);
+      color: var(--d-primary);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       MAIN LAYOUT
+    ══════════════════════════════════════════════════════════════ */
+    main {
+      position: relative;
+      z-index: 5;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       ██████  KAUSHALESH SECTION  ██████
+    ══════════════════════════════════════════════════════════════ */
+    #kaushalesh-section {
+      margin-top: 2rem;
+    }
+
+    .k-card {
+      background: var(--surface);
+      border: 1px solid var(--k-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--card-shadow), 0 0 40px rgba(124,58,237,0.06);
+      backdrop-filter: blur(12px);
+      transition: box-shadow var(--tr);
+    }
+
+    .k-card:hover {
+      box-shadow: var(--card-shadow), 0 0 60px rgba(124,58,237,0.10);
+    }
+
+    .k-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .k-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .k-icon-box {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--k-accent), #4c1d95);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    }
+
+    .k-card-title { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+    .k-card-desc  { font-size: 0.8rem;  color: var(--text-muted); margin-top: 2px; }
+
+    .k-author-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(167,139,250,0.10);
+      border: 1px solid var(--k-border);
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--k-primary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Form grid ── */
+    .k-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem 1.5rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .k-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .k-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .k-label span { font-size: 0.9em; }
+
+    .k-input, .k-select {
+      padding: 0.75rem 1rem;
+      background: var(--bg2);
+      border: 1.5px solid rgba(167,139,250,0.18);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color var(--tr), box-shadow var(--tr);
+      width: 100%;
+    }
+
+    .k-input:focus, .k-select:focus {
+      border-color: var(--k-primary);
+      box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+    }
+
+    .k-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+    .k-select option { background: var(--surface2); }
+
+    .k-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    .k-submit-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    #k-submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.9rem 2rem;
+      background: linear-gradient(135deg, var(--k-accent), #6d28d9);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-size: 0.93rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform var(--tr), box-shadow var(--tr), opacity var(--tr);
+      box-shadow: 0 4px 20px rgba(124,58,237,0.38);
+    }
+
+    #k-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.45); }
+    #k-submit-btn:active { transform: translateY(0); }
+    #k-submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .k-reset-btn {
+      padding: 0.9rem 1.4rem;
+      background: transparent;
+      border: 1px solid var(--k-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.85rem; font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+    .k-reset-btn:hover { border-color: var(--k-primary); color: var(--k-primary); }
+
+    /* ── Result panel ── */
+    #k-result-panel {
+      margin-top: 1.8rem;
+      display: none;
+      animation: slideUp 0.4s ease both;
+    }
+    #k-result-panel.show { display: block; }
+
+    .k-result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    @media (max-width: 600px) { .k-result-grid { grid-template-columns: 1fr; } }
+
+    .k-result-card {
+      background: var(--surface2);
+      border: 1px solid var(--k-border);
+      border-radius: var(--radius-sm);
+      padding: 1.4rem 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .k-result-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .k-result-card.segment-card::before { background: linear-gradient(90deg, var(--k-accent), var(--k-primary)); }
+    .k-result-card.prob-card::before    { background: linear-gradient(90deg, var(--d-accent), var(--d-primary)); }
+
+    .k-result-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .k-segment-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .k-segment-badge.high   { background: rgba(52,211,153,0.12); border: 1.5px solid rgba(52,211,153,0.3); color: var(--green); }
+    .k-segment-badge.medium { background: rgba(251,191,36,0.12);  border: 1.5px solid rgba(251,191,36,0.3);  color: var(--amber); }
+    .k-segment-badge.low    { background: rgba(248,113,113,0.12); border: 1.5px solid rgba(248,113,113,0.3); color: var(--red); }
+
+    .k-segment-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Probability gauge */
+    .k-prob-value {
+      font-size: 2.4rem;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .k-prob-bar-wrap {
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 0.4rem;
+    }
+
+    .k-prob-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--d-accent), var(--d-primary), var(--green));
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .k-prob-label {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+    }
+
+    /* RFM chips */
+    .k-rfm-row {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .k-rfm-chip {
+      flex: 1;
+      min-width: 90px;
+      background: var(--surface3);
+      border: 1px solid var(--k-border);
+      border-radius: var(--radius-xs);
+      padding: 0.7rem 0.9rem;
+      text-align: center;
+    }
+
+    .k-rfm-chip-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--k-primary);
+    }
+
+    .k-rfm-chip-lbl {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Recommended categories */
+    .k-reco-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .k-reco-cats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .k-reco-cat {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(167,139,250,0.10);
+      border: 1px solid var(--k-border);
+      color: var(--k-primary);
+    }
+
+    /* Error msg */
+    .k-error {
+      padding: 1rem 1.2rem;
+      background: rgba(248,113,113,0.10);
+      border: 1px solid rgba(248,113,113,0.28);
+      border-radius: var(--radius-sm);
+      color: #fca5a5;
+      font-size: 0.88rem;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .k-error.show { display: flex; }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════════════════════════════════════
+       ██████  DMART SECTION  ██████
+    ══════════════════════════════════════════════════════════════ */
+    #dmart-section {
+      margin-top: 2rem;
+    }
+
+    .d-card {
+      background: var(--surface);
+      border: 1px solid var(--d-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--card-shadow), 0 0 40px rgba(2,132,199,0.05);
+      backdrop-filter: blur(12px);
+    }
+
+    .d-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .d-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .d-icon-box {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--d-accent), #0e4f7a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 16px rgba(2,132,199,0.35);
+    }
+
+    .d-card-title { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+    .d-card-desc  { font-size: 0.8rem;  color: var(--text-muted); margin-top: 2px; }
+
+    .d-stats-chips {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .d-stat-chip {
+      text-align: center;
+      background: rgba(56,189,248,0.07);
+      border: 1px solid var(--d-border);
+      border-radius: var(--radius-xs);
+      padding: 6px 14px;
+    }
+
+    .d-stat-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--d-primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .d-stat-lbl {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+    }
+
+    /* Search */
+    .d-search-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .d-input-row {
+      display: flex;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .d-search-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .d-search-icon {
+      position: absolute;
+      left: 1rem; top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.45;
+      pointer-events: none;
+      font-size: 1rem;
+    }
+
+    #product-input {
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      background: var(--bg2);
+      border: 1.5px solid rgba(56,189,248,0.20);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color var(--tr), box-shadow var(--tr);
+    }
+    #product-input:focus {
+      border-color: var(--d-primary);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.12);
+    }
+    #product-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+    /* Autocomplete */
+    #autocomplete-list {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: var(--surface2);
+      border: 1px solid var(--d-border);
+      border-radius: var(--radius-sm);
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: var(--card-shadow);
+      display: none;
+    }
+    #autocomplete-list.open { display: block; }
+
+    #autocomplete-list::-webkit-scrollbar { width: 5px; }
+    #autocomplete-list::-webkit-scrollbar-thumb {
+      background: rgba(56,189,248,0.25);
+      border-radius: 3px;
+    }
+
+    .autocomplete-item {
+      padding: 0.65rem 1rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background var(--tr);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover, .autocomplete-item.active {
+      background: rgba(56,189,248,0.10);
+      color: var(--d-primary);
+    }
+
+    #d-recommend-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.9rem 1.8rem;
+      background: linear-gradient(135deg, var(--d-accent), #0369a1);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-size: 0.93rem; font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform var(--tr), box-shadow var(--tr), opacity var(--tr);
+      box-shadow: 0 4px 20px rgba(2,132,199,0.38);
+    }
+    #d-recommend-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(2,132,199,0.45); }
+    #d-recommend-btn:active { transform: translateY(0); }
+    #d-recommend-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    /* Messages */
+    .d-message {
+      padding: 0.9rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      margin-top: 1rem;
+      display: none;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .d-message.show { display: flex; }
+    .d-message.error { background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.28); color: #fca5a5; }
+    .d-message.info  { background: rgba(56,189,248,0.08);  border: 1px solid var(--d-border); color: var(--text-muted); }
+
+    /* Results */
+    #d-results-section { display: none; }
+    #d-results-section.show { display: block; }
+
+    .d-results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.6rem 0 1rem;
+    }
+
+    .d-results-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .d-result-tag {
+      font-size: 0.73rem;
+      background: rgba(52,211,153,0.12);
+      border: 1px solid rgba(52,211,153,0.25);
+      color: var(--green);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-weight: 600;
+    }
+
+    .d-clear-btn {
+      background: transparent;
+      border: 1px solid var(--d-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      padding: 5px 14px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--tr);
+    }
+    .d-clear-btn:hover { border-color: var(--d-primary); color: var(--d-primary); }
+
+    /* Product cards grid */
+    #d-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.1rem;
+    }
+
+    .product-card {
+      background: var(--surface2);
+      border: 1px solid var(--d-border);
+      border-radius: var(--radius);
+      padding: 1.3rem 1.1rem;
+      box-shadow: var(--card-shadow);
+      transition: transform var(--tr), box-shadow var(--tr), border-color var(--tr);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.4s ease both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--d-accent), var(--d-primary), var(--green));
+      opacity: 0;
+      transition: opacity var(--tr);
+    }
+
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.5); border-color: var(--d-primary); }
+    .product-card:hover::before { opacity: 1; }
+
+    .card-rank {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      width: 26px; height: 26px;
+      background: linear-gradient(135deg, var(--d-accent), var(--d-primary));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800;
+      color: white;
+    }
+
+    .card-category { font-size: 0.68rem; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    .card-name     { font-size: 0.9rem;  font-weight: 700; line-height: 1.4; padding-right: 2rem; margin-bottom: 0.3rem; color: var(--text); }
+    .card-brand    { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.9rem; }
+
+    .card-prices {
+      display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+    }
+    .price-now  { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+    .price-was  { font-size: 0.78rem; color: var(--text-muted); text-decoration: line-through; }
+    .disc-badge {
+      font-size: 0.7rem; font-weight: 700;
+      background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25); color: var(--green);
+      border-radius: 999px; padding: 2px 8px;
+    }
+
+    .subcat-tag {
+      display: inline-block;
+      margin-top: 0.7rem;
+      font-size: 0.68rem;
+      background: rgba(56,189,248,0.08);
+      border: 1px solid rgba(56,189,248,0.18);
+      color: var(--d-primary);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-weight: 500;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       INFO CARDS (bottom)
+    ══════════════════════════════════════════════════════════════ */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .info-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.2rem;
+    }
+    .info-card-icon  { font-size: 1.6rem; margin-bottom: 0.6rem; }
+    .info-card-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .info-card-desc  { font-size: 0.75rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* ══════════════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════════════ */
+    footer {
+      position: relative; z-index: 5;
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+    }
+    footer strong { color: var(--text); }
+
+    /* ══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════════════════════ */
+    @media (max-width: 700px) {
+      .d-input-row    { flex-direction: column; }
+      .k-submit-row   { flex-direction: column; align-items: stretch; }
+      #k-submit-btn, .k-reset-btn { width: 100%; justify-content: center; }
+      .k-form-grid    { grid-template-columns: 1fr; }
+      .global-header  { padding: 1.5rem 1rem 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══ GLOBAL HEADER ═══════════════════════════════════════════ -->
+  <header class="global-header">
+    <div class="platform-badge">
+      <span class="pulse-dot"></span>
+      AI Intelligence Platform · Live
+    </div>
+    <h1 class="global-title">Customer Analytics &amp; Product AI</h1>
+    <p class="global-subtitle">
+      Two independent ML modules: <strong style="color:var(--k-primary)">Customer Intelligence</strong>
+      &amp; <strong style="color:var(--d-primary)">Product Recommendation Engine</strong>
+    </p>
+
+    <div class="nav-pills">
+      <a class="nav-pill k-pill" href="#kaushalesh-section">👤 Customer Intelligence</a>
+      <a class="nav-pill d-pill" href="#dmart-section">🛒 Product Recommender</a>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN ═════════════════════════════════════════════════════ -->
+  <main>
+
+    <!-- ─────────────────────────────────────────────────────────
+         SECTION 1 — KAUSHALESH CUSTOMER INTELLIGENCE
+    ──────────────────────────────────────────────────────────── -->
+    <div class="section-sep" style="margin-top:2.5rem;">
+      <div class="section-sep-line k-line"></div>
+      <div class="section-sep-label k-label">
+        <span>👤</span> Customer Intelligence Module
+      </div>
+      <div class="section-sep-line k-line"></div>
+    </div>
+
+    <section id="kaushalesh-section">
+
+      <div class="k-card">
+        <!-- Header -->
+        <div class="k-card-header">
+          <div class="k-card-title-group">
+            <div class="k-icon-box">🧠</div>
+            <div>
+              <div class="k-card-title">Customer Value Analyzer</div>
+              <div class="k-card-desc">RFM-based segment prediction & purchase probability</div>
+            </div>
+          </div>
+          <div class="k-author-tag">
+            <span>✦</span> Intelligence Module
+          </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="k-form-grid">
+
+          <div class="k-field">
+            <label class="k-label" for="k-recency"><span>📅</span> Days Since Last Purchase</label>
+            <input class="k-input" id="k-recency" type="number" min="0" max="365" placeholder="e.g. 30" value="30" />
+            <span class="k-hint">Recency — lower = more recent</span>
+          </div>
+
+          <div class="k-field">
+            <label class="k-label" for="k-frequency"><span>🔁</span> Number of Transactions</label>
+            <input class="k-input" id="k-frequency" type="number" min="0" max="200" placeholder="e.g. 12" value="12" />
+            <span class="k-hint">Frequency — total purchases</span>
+          </div>
+
+          <div class="k-field">
+            <label class="k-label" for="k-monetary"><span>💰</span> Total Spend (₹)</label>
+            <input class="k-input" id="k-monetary" type="number" min="0" placeholder="e.g. 4500" value="4500" />
+            <span class="k-hint">Monetary — lifetime spend amount</span>
+          </div>
+
+          <div class="k-field">
+            <label class="k-label" for="k-age"><span>🎂</span> Age (optional)</label>
+            <input class="k-input" id="k-age" type="number" min="10" max="100" placeholder="e.g. 28" value="28" />
+          </div>
+
+          <div class="k-field">
+            <label class="k-label" for="k-gender"><span>⚧</span> Gender (optional)</label>
+            <select class="k-select" id="k-gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="k-field">
+            <label class="k-label" for="k-location"><span>📍</span> Location (optional)</label>
+            <select class="k-select" id="k-location">
+              <option value="Mumbai">Mumbai</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Pune">Pune</option>
+            </select>
+          </div>
+
+          <div class="k-field">
+            <label class="k-label" for="k-device"><span>📱</span> Device Type (optional)</label>
+            <select class="k-select" id="k-device">
+              <option value="Mobile">Mobile</option>
+              <option value="Desktop">Desktop</option>
+              <option value="Tablet">Tablet</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Submit row -->
+        <div class="k-submit-row">
+          <button id="k-submit-btn" onclick="analyzeCustomer()">
+            <span id="k-btn-text">Analyze Customer</span>
+            <div class="spinner" id="k-spinner"></div>
+          </button>
+          <button class="k-reset-btn" onclick="resetCustomerForm()">↺ Reset</button>
+        </div>
+
+        <!-- Error -->
+        <div class="k-error" id="k-error">
+          <span>⚠️</span>
+          <span id="k-error-text">Something went wrong.</span>
+        </div>
+
+        <!-- Result Panel -->
+        <div id="k-result-panel">
+          <div class="k-result-grid">
+
+            <!-- Segment card -->
+            <div class="k-result-card segment-card">
+              <div class="k-result-label">Customer Segment</div>
+              <div class="k-segment-badge" id="k-segment-badge"></div>
+              <div class="k-segment-desc" id="k-segment-desc"></div>
+            </div>
+
+            <!-- Probability card -->
+            <div class="k-result-card prob-card">
+              <div class="k-result-label">Purchase Probability</div>
+              <div class="k-prob-value" id="k-prob-value" style="color: var(--d-primary)">—</div>
+              <div class="k-prob-bar-wrap">
+                <div class="k-prob-bar" id="k-prob-bar" style="width:0%"></div>
+              </div>
+              <div class="k-prob-label" id="k-prob-label">Likelihood of next purchase</div>
+            </div>
+          </div>
+
+          <!-- RFM summary chips -->
+          <div class="k-rfm-row" id="k-rfm-row">
+            <div class="k-rfm-chip">
+              <div class="k-rfm-chip-val" id="k-rfm-r">—</div>
+              <div class="k-rfm-chip-lbl">Recency (days)</div>
+            </div>
+            <div class="k-rfm-chip">
+              <div class="k-rfm-chip-val" id="k-rfm-f">—</div>
+              <div class="k-rfm-chip-lbl">Frequency</div>
+            </div>
+            <div class="k-rfm-chip">
+              <div class="k-rfm-chip-val" id="k-rfm-m">—</div>
+              <div class="k-rfm-chip-lbl">Monetary (₹)</div>
+            </div>
+          </div>
+
+          <!-- Category recommendations -->
+          <div class="k-reco-label">🤖 AI-Recommended Categories</div>
+          <div class="k-reco-cats" id="k-reco-cats"></div>
+        </div>
+
+      </div><!-- /.k-card -->
+
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────
+         SECTION 2 — DMART PRODUCT RECOMMENDATION
+    ──────────────────────────────────────────────────────────── -->
+    <div class="section-sep" style="margin-top:3.5rem;">
+      <div class="section-sep-line d-line"></div>
+      <div class="section-sep-label d-label">
+        <span>🛒</span> Product Recommendation Engine
+      </div>
+      <div class="section-sep-line d-line"></div>
+    </div>
+
+    <section id="dmart-section" style="margin-top:2rem;">
+
+      <div class="d-card">
+        <!-- Header -->
+        <div class="d-card-header">
+          <div class="d-card-title-group">
+            <div class="d-icon-box">🛍️</div>
+            <div>
+              <div class="d-card-title">Product Recommendation Engine</div>
+              <div class="d-card-desc">K-Means Clustering + KNN Similarity Search</div>
+            </div>
+          </div>
+          <!-- Stats chips -->
+          <div class="d-stats-chips" id="d-stats-chips">
+            <div class="d-stat-chip">
+              <div class="d-stat-val" id="stat-products">—</div>
+              <div class="d-stat-lbl">Products</div>
+            </div>
+            <div class="d-stat-chip">
+              <div class="d-stat-val" id="stat-clusters">—</div>
+              <div class="d-stat-lbl">Clusters</div>
+            </div>
+            <div class="d-stat-chip">
+              <div class="d-stat-val" id="stat-brands">—</div>
+              <div class="d-stat-lbl">Brands</div>
+            </div>
+            <div class="d-stat-chip">
+              <div class="d-stat-val" id="stat-categories">—</div>
+              <div class="d-stat-lbl">Categories</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <label class="d-search-label" for="product-input">🔍 Search Product Name</label>
+        <div class="d-input-row">
+          <div class="d-search-wrap">
+            <span class="d-search-icon">🛒</span>
+            <input id="product-input" type="text"
+              placeholder="e.g. Premia Badam, Nutraj Cashews, Fortune Sunflower Oil…"
+              autocomplete="off" spellcheck="false" />
+            <div id="autocomplete-list"></div>
+          </div>
+          <button id="d-recommend-btn" onclick="getRecommendations()">
+            <span id="d-btn-text">Get Recommendations</span>
+            <div class="spinner" id="d-spinner"></div>
+          </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="d-message error" id="d-error-msg">
+          <span>⚠️</span>
+          <span id="d-error-text">Product not found. Try a different name.</span>
+        </div>
+        <div class="d-message info" id="d-info-msg">
+          <span>ℹ️</span>
+          <span id="d-info-text">Loading…</span>
+        </div>
+
+        <!-- Results -->
+        <div id="d-results-section">
+          <div class="d-results-header">
+            <div class="d-results-title">
+              Recommended Products
+              <span class="d-result-tag" id="d-count-tag">5 results</span>
+            </div>
+            <button class="d-clear-btn" onclick="clearDMartResults()">✕ Clear</button>
+          </div>
+          <div id="d-cards-grid"></div>
+        </div>
+
+        <!-- Info cards -->
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-card-icon">🧮</div>
+            <div class="info-card-title">K-Means Clustering</div>
+            <div class="info-card-desc">Products grouped into optimal clusters based on brand, category, price and discount.</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">📍</div>
+            <div class="info-card-title">KNN Similarity</div>
+            <div class="info-card-desc">Within each cluster, KNN finds similar products via Euclidean distance on scaled features.</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">⚙️</div>
+            <div class="info-card-title">Feature Engineering</div>
+            <div class="info-card-desc">Frequency-encoded categoricals + StandardScaler normalization for price, quantity and discount.</div>
+          </div>
+        </div>
+
+      </div><!-- /.d-card -->
+
+    </section>
+
+  </main>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════════ -->
+  <footer>
+    <strong>AI Intelligence Platform</strong> ·
+    <span style="color:var(--k-primary)">Customer Intelligence</span> +
+    <span style="color:var(--d-primary)">Product Recommendation Engine</span>
+    · Powered by scikit-learn &amp; Flask
+  </footer>
+
+  <!-- ═══ JAVASCRIPT ════════════════════════════════════════════════ -->
+  <script>
+    /* ══════════════════════════════════════════════════════════════
+       UTILITIES
+    ══════════════════════════════════════════════════════════════ */
+    const $ = id => document.getElementById(id);
+    const formatINR = n => '₹' + Number(n).toLocaleString('en-IN');
+
+    /* ══════════════════════════════════════════════════════════════
+       KAUSHALESH — Customer Intelligence
+    ══════════════════════════════════════════════════════════════ */
+    function kSetLoading(on) {
+      $('k-submit-btn').disabled = on;
+      $('k-spinner').style.display = on ? 'block' : 'none';
+      $('k-btn-text').textContent = on ? 'Analyzing…' : 'Analyze Customer';
+    }
+
+    function kShowError(msg) {
+      $('k-error-text').textContent = msg;
+      $('k-error').classList.add('show');
+    }
+    function kHideError() { $('k-error').classList.remove('show'); }
+
+    const segmentMeta = {
+      high:   { desc: 'Top-tier customer with high spending, frequent visits, and recent activity. Prioritize loyalty rewards.', color: '#34d399' },
+      medium: { desc: 'Moderate engagement and spend. Great upsell potential with targeted campaigns.', color: '#fbbf24' },
+      low:    { desc: 'Infrequent purchaser or low spend. Re-engagement offers recommended.', color: '#f87171' },
+    };
+
+    async function analyzeCustomer() {
+      kHideError();
+      $('k-result-panel').classList.remove('show');
+
+      const payload = {
+        Days_Since_Last_Purchase: parseFloat($('k-recency').value)   || 30,
+        Num_Transactions:         parseFloat($('k-frequency').value) || 5,
+        Total_Spend:              parseFloat($('k-monetary').value)  || 500,
+        Age:                      parseFloat($('k-age').value)       || 28,
+        Gender:                   $('k-gender').value,
+        Location:                 $('k-location').value,
+        Device_Type:              $('k-device').value,
+      };
+
+      kSetLoading(true);
+      try {
+        const res  = await fetch('/predict_customer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (data.status === 'error') {
+          kShowError(data.message || 'Prediction failed. Please try again.');
+          return;
+        }
+
+        renderCustomerResult(data);
+
+      } catch (err) {
+        kShowError('Network error. Is the Flask server running on port 5000?');
+      } finally {
+        kSetLoading(false);
+      }
+    }
+
+    function renderCustomerResult(data) {
+      const color = data.segment_color;   // 'high' | 'medium' | 'low'
+      const meta  = segmentMeta[color] || segmentMeta.low;
+
+      // Segment badge
+      const badge = $('k-segment-badge');
+      badge.className = `k-segment-badge ${color}`;
+      badge.textContent = data.segment_label;
+
+      $('k-segment-desc').textContent = meta.desc;
+
+      // Probability
+      const prob = data.purchase_probability;
+      const pct  = Math.round(prob * 100);
+      $('k-prob-value').textContent = (pct) + '%';
+      $('k-prob-bar').style.width   = pct + '%';
+      $('k-prob-label').textContent = `Purchase probability: ${prob.toFixed(3)} (AI confidence: ${Math.round(data.clf_confidence * 100)}%)`;
+
+      // RFM chips
+      const rfm = data.rfm_scores;
+      $('k-rfm-r').textContent = rfm.recency;
+      $('k-rfm-f').textContent = rfm.frequency;
+      $('k-rfm-m').textContent = '₹' + Number(rfm.monetary).toLocaleString('en-IN');
+
+      // Category recommendations
+      const catsEl = $('k-reco-cats');
+      catsEl.innerHTML = '';
+      const catIcons = { Electronics:'💻', Fashion:'👗', Books:'📚', Beauty:'💄', Home:'🏠', Sports:'⚽', default:'🛍️' };
+      (data.recommended_categories || []).forEach(cat => {
+        const icon = catIcons[cat] || catIcons.default;
+        const span = document.createElement('span');
+        span.className = 'k-reco-cat';
+        span.textContent = icon + ' ' + cat;
+        catsEl.appendChild(span);
+      });
+
+      $('k-result-panel').classList.add('show');
+    }
+
+    function resetCustomerForm() {
+      $('k-recency').value   = 30;
+      $('k-frequency').value = 12;
+      $('k-monetary').value  = 4500;
+      $('k-age').value       = 28;
+      $('k-gender').value    = 'Male';
+      $('k-location').value  = 'Mumbai';
+      $('k-device').value    = 'Mobile';
+      kHideError();
+      $('k-result-panel').classList.remove('show');
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DMART — Product Recommendation
+    ══════════════════════════════════════════════════════════════ */
+    let allProducts = [];
+    let acActive    = -1;
+
+    function dShowError(msg) {
+      $('d-error-text').textContent = msg;
+      $('d-error-msg').classList.add('show');
+      $('d-info-msg').classList.remove('show');
+    }
+    function dShowInfo(msg) {
+      $('d-info-text').textContent = msg;
+      $('d-info-msg').classList.add('show');
+      $('d-error-msg').classList.remove('show');
+    }
+    function dHideMessages() {
+      $('d-error-msg').classList.remove('show');
+      $('d-info-msg').classList.remove('show');
+    }
+
+    function dSetLoading(on) {
+      $('d-recommend-btn').disabled = on;
+      $('d-spinner').style.display  = on ? 'block' : 'none';
+      $('d-btn-text').textContent   = on ? 'Analysing…' : 'Get Recommendations';
+    }
+
+    // Load stats
+    async function loadStats() {
+      try {
+        const r = await fetch('/stats');
+        const d = await r.json();
+        $('stat-products').textContent   = d.total_products?.toLocaleString() ?? '—';
+        $('stat-clusters').textContent   = d.total_clusters ?? '—';
+        $('stat-brands').textContent     = d.unique_brands?.toLocaleString() ?? '—';
+        $('stat-categories').textContent = d.unique_categories ?? '—';
+      } catch {}
+    }
+
+    // Load product names for autocomplete
+    async function loadProducts() {
+      try {
+        const r = await fetch('/products');
+        const d = await r.json();
+        allProducts = d.products || [];
+      } catch {}
+    }
+
+    // Autocomplete
+    const prodInput = $('product-input');
+    const acList    = $('autocomplete-list');
+
+    prodInput.addEventListener('input', function () {
+      const q = this.value.trim().toLowerCase();
+      acList.innerHTML = '';
+      acActive = -1;
+      if (!q || q.length < 2) { acList.classList.remove('open'); return; }
+
+      const matches = allProducts.filter(p => p.toLowerCase().includes(q)).slice(0, 12);
+      if (!matches.length) { acList.classList.remove('open'); return; }
+
+      matches.forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        const idx = name.toLowerCase().indexOf(q);
+        div.innerHTML =
+          name.substring(0, idx) +
+          '<strong style="color:var(--d-primary)">' + name.substring(idx, idx + q.length) + '</strong>' +
+          name.substring(idx + q.length);
+        div.addEventListener('mousedown', e => {
+          e.preventDefault();
+          prodInput.value = name;
+          acList.classList.remove('open');
+        });
+        acList.appendChild(div);
+      });
+      acList.classList.add('open');
+    });
+
+    prodInput.addEventListener('keydown', function (e) {
+      const items = acList.querySelectorAll('.autocomplete-item');
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); acActive = Math.min(acActive + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === acActive)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); acActive = Math.max(acActive - 1, -1); items.forEach((el, i) => el.classList.toggle('active', i === acActive)); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (acActive >= 0) { prodInput.value = items[acActive].textContent; acList.classList.remove('open'); } getRecommendations(); }
+      else if (e.key === 'Escape') { acList.classList.remove('open'); }
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.d-search-wrap')) acList.classList.remove('open');
+    });
+
+    async function getRecommendations() {
+      const name = prodInput.value.trim();
+      if (!name) { dShowError('Please enter a product name first.'); return; }
+
+      acList.classList.remove('open');
+      dHideMessages();
+      dSetLoading(true);
+      clearDMartResults(false);
+
+      try {
+        const res  = await fetch('/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_name: name }),
+        });
+        const data = await res.json();
+        if (!res.ok) { dShowError(data.error || 'Something went wrong.'); return; }
+        renderDMartCards(data.recommendations);
+      } catch (err) {
+        dShowError('Network error. Is the Flask server running?');
+      } finally {
+        dSetLoading(false);
+      }
+    }
+
+    function renderDMartCards(items) {
+      const grid    = $('d-cards-grid');
+      const section = $('d-results-section');
+      const tag     = $('d-count-tag');
+
+      grid.innerHTML = '';
+      tag.textContent = items.length + ' result' + (items.length !== 1 ? 's' : '');
+
+      items.forEach((item, i) => {
+        const hasDisc = item.price > item.discounted_price;
+        const card    = document.createElement('div');
+        card.className = 'product-card';
+        card.style.animationDelay = (i * 0.07) + 's';
+
+        card.innerHTML = `
+          <div class="card-rank">${i + 1}</div>
+          <div class="card-category">${item.category || '—'}</div>
+          <div class="card-name">${item.name}</div>
+          <div class="card-brand">${item.brand ? '🏷️ ' + item.brand : ''}</div>
+          <div class="card-prices">
+            <span class="price-now">${formatINR(item.discounted_price)}</span>
+            ${hasDisc ? `<span class="price-was">${formatINR(item.price)}</span>` : ''}
+            ${item.discount_pct > 0 ? `<span class="disc-badge">${item.discount_pct}% off</span>` : ''}
+          </div>
+          ${item.subcategory && item.subcategory !== item.category
+            ? `<div class="subcat-tag">${item.subcategory}</div>` : ''}
+        `;
+        grid.appendChild(card);
+      });
+
+      section.classList.add('show');
+    }
+
+    function clearDMartResults(clearInput = true) {
+      $('d-cards-grid').innerHTML = '';
+      $('d-results-section').classList.remove('show');
+      dHideMessages();
+      if (clearInput) prodInput.value = '';
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       INIT
+    ══════════════════════════════════════════════════════════════ */
+    (async () => {
+      dShowInfo('Loading model stats and product catalogue…');
+      await Promise.all([loadStats(), loadProducts()]);
+      dHideMessages();
+    })();
+  </script>
+
+</body>
+</html>
